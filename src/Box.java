@@ -1,9 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class Box extends JTextArea {
+public class Box extends JTextField {
     // fields
-    public int row, col;
     public int num;
     /*
     param: number will be the number displayed on the box
@@ -16,9 +15,7 @@ public class Box extends JTextArea {
         super.setBackground(Color.WHITE);
         super.setFont(new Font("Serif", Font.BOLD, 60));
         super.setBorder(BorderFactory.createLineBorder(Color.black));
-        super.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-//        this.row = row;
-//        this.col = col;
+        //super.getLineStartOffset(getLineCount() / 2);
     }
 
     /*
@@ -28,10 +25,11 @@ public class Box extends JTextArea {
     public Box() {
         super();
         super.setBackground(Color.WHITE);
+        super.setEditable(true);
+        super.setFont(new Font("Serif", Font.BOLD, 60));
+        super.setBorder(BorderFactory.createLineBorder(Color.black));
         num = 0; // temporarily set this as 0
         // since 0 is not 1-9, if num is 0, then i know this box is currently unassigned
-//        this.row = row;
-//        this.col = col;
     }
 
     /*
@@ -41,7 +39,10 @@ public class Box extends JTextArea {
      */
     public void temporary(int number) {
         this.num = number;
-        this.setFont(new Font("SansSerif", Font.BOLD, 60));
+        this.setFont(new Font("SansSerif", Font.BOLD, 15));
+        this.setText(number+"");
+        this.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.setEditable(true);
     }
 
     /*
@@ -50,7 +51,7 @@ public class Box extends JTextArea {
     this method will display the number the user wants to fill in permanently
      */
     public void fill(int number) {
-
+        changeNum(number);
     }
 
     public void changeNum(int number) {
@@ -59,6 +60,7 @@ public class Box extends JTextArea {
         this.setBackground(Color.WHITE);
         this.setFont(new Font("Serif", Font.BOLD, 60));
         this.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.setEditable(false);
     }
 
     public int getNum() {
