@@ -4,17 +4,20 @@ import java.awt.*;
 public class Box extends JTextField {
     // fields
     public int num;
+    public int row, col;
     /*
     param: number will be the number displayed on the box
     in this constructor, the box will not be an input field
      */
-    public Box(int number) {
+    public Box(int number, int row, int col) {
         super(number+"");
         num = number;
         super.setEditable(false);
         super.setBackground(Color.WHITE);
         super.setFont(new Font("Serif", Font.BOLD, 60));
         super.setBorder(BorderFactory.createLineBorder(Color.black));
+        this.row = row;
+        this.col = col;
         //super.getLineStartOffset(getLineCount() / 2);
     }
 
@@ -22,8 +25,10 @@ public class Box extends JTextField {
     param: none
     in this constructor, the box will be an input field for the user to try numbers
      */
-    public Box() {
+    public Box(int row, int col) {
         super();
+        this.row = row;
+        this.col = col;
         super.setBackground(Color.WHITE);
         super.setEditable(true);
         super.setFont(new Font("Serif", Font.BOLD, 60));
@@ -37,7 +42,7 @@ public class Box extends JTextField {
     return: none
     this method will display the number the user wants to temporarily hold
      */
-    public void temporary(int number) {
+    public void temporaryChange(int number) {
         this.num = number;
         this.setFont(new Font("SansSerif", Font.BOLD, 15));
         this.setText(number+"");
@@ -50,20 +55,17 @@ public class Box extends JTextField {
     return: none
     this method will display the number the user wants to fill in permanently
      */
-    public void fill(int number) {
-        changeNum(number);
-    }
-
     public void changeNum(int number) {
         this.num = number;
         this.setText(number+"");
-        this.setBackground(Color.WHITE);
+        //this.setBackground(Color.WHITE);
         this.setFont(new Font("Serif", Font.BOLD, 60));
         this.setBorder(BorderFactory.createLineBorder(Color.black));
-        this.setEditable(false);
+        this.setEditable(true);
     }
 
     public int getNum() {
         return this.num;
     }
+
 }

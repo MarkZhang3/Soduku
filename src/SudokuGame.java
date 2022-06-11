@@ -1,7 +1,103 @@
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
-public class SudokuGame {
-    public SudokuGame(){
+import java.util.concurrent.TimeUnit;
 
+public class SudokuGame extends JPanel {
+    // fields
+    private static final int SIZE = 9; // max length size
+    public Box[][] grid = new Box[SIZE][SIZE]; // grid to store values of all Boxes on the 9x9 grid
+    public SudokuGame() {
+        super();
+
+        super.setLayout(new GridLayout(SIZE, SIZE)); // make the JFrame a grid layout that is 9x9
+
+        // temporarily fill it with boxes
+        for (int i = 0; i < SIZE; i ++) {
+            for (int j = 0; j < SIZE; j++) {
+                grid[i][j] = new Box(i, j);
+            }
+        }
+
+        // add 2 random numbers to the grid
+        // 2 numbers is a small amount -> it is guaranteed there will be a solution
+        for (int i = 0; i < 2;) {
+            int row = (int) (Math.random() * 3), col = (int) (Math.random() * 3);
+            int randomNum = 1 + (int) (Math.random() * 9);
+            if (valid(grid, row, col, randomNum)) {
+                grid[row][col] = new Box(randomNum, row, col);
+                i++;
+            }
+        }
+        // change the first box to make things more random
+        // the way the "solve" algorithm works is trial and error starting from 1 first
+        // so if the first box isnt filled, the chances of the row being 1, 2, 3...
+        // is very very high
+        int randomNum = 1 + (int) (Math.random() * 9);
+        while (!valid(grid, 0, 0, randomNum)) {
+            randomNum = 1 + (int) (Math.random() * 9);
+        }
+        grid[0][0] = new Box(randomNum, 0, 0);
+
+        // for checking
+        printGrid(grid);
+        // generate solution for it
+        getSolution(grid, 0, 0);
+
+        // white out majority of the boxes, leave some remaining
+        int boxesKeptCount = 20+(int)(Math.random()*25);
+        int[][] boxesKept = new int[boxesKeptCount][2];
+        for (int i = 0; i < boxesKeptCount; i++) {
+            int row = (int)(Math.random()*9), col = (int)(Math.random()*9);
+            boxesKept[i][0] = row;
+            boxesKept[i][1] = col;
+        }
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                boolean temp = true;
+                for (int[] ints : boxesKept) {
+                    if (i == ints[0] && j == ints[1]) {
+                        temp = false;
+                        break;
+                    }
+                }
+                if (temp) {
+                    grid[i][j] = new Box(i, j);
+                    grid[i][j].addActionListener(new BoxListener());
+                }
+            }
+        }
+
+        for (Box[] boxes : grid) {
+            for (Box b: boxes)  {
+                super.add(b);
+            }
+        }
+        printGrid(grid);
+        super.setVisible(true);
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+    }
+
+    public Box[][] getGrid() {
+        return grid;
+    }
+
+
+    // An action listener for each box
+    public class BoxListener implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            Box sourceBox = (Box)e.getSource(); // gets the box that was clicked on
+            int numEntered = Integer.parseInt(sourceBox.getText()); // gets integer
+            System.out.println(numEntered + " " + sourceBox.row + " " + sourceBox.col);
+            paintBox(getGrid(), sourceBox.row, sourceBox.col, numEntered); // change the box accordingly
+            grid[sourceBox.row][sourceBox.col].changeNum(numEntered); // update the grid with made changes
+        }
     }
     public boolean getSolution(Box[][] grid, int row, int col) {
         // base case
@@ -29,7 +125,7 @@ public class SudokuGame {
                 // temporarily change the current grid[row][col]
                 // and check if a solution can be found
                 grid[row][col].changeNum(trialNum);
-                printGrid(grid);
+                //printGrid(grid);
                 if (getSolution(grid, row, col+1)) {
                     return true;
                 }
@@ -45,11 +141,13 @@ public class SudokuGame {
     public boolean valid(Box[][] grid, int row, int col, int num) {
         for (int i = 0; i < 9; i++) { // checks current column
             if (grid[i][col].getNum() == num) { // if box.num has been repeated
+                //System.out.println('a');
                 return false;
             }
         }
         for (int i = 0; i < 9; i++) { // check current row
             if (grid[row][i].getNum() == num) {
+                //System.out.println('b');
                 return false;
             }
         }
@@ -59,6 +157,7 @@ public class SudokuGame {
         for (int i = startRow; i < startRow + 3; i++) {
             for (int j = startCol; j < startCol + 3; j++) {
                 if (grid[i][j].getNum() == num) {
+                    //System.out.println('c');
                     return false;
                 }
             }
@@ -76,4 +175,71 @@ public class SudokuGame {
         }
         System.out.println();
     }
+
+    /*
+    paints the boxes that have been filled out with corresponding colours:
+    RED for a wrong guess
+    GREEN for a guess that works based on the CURRENT state of the board
+     */
+    public void paintBox(Box[][] grid, int row, int col, int num)  {
+        if (valid(grid, row, col, num)) {
+            grid[row][col].setBackground(Color.GREEN);
+            //System.out.println('p');
+        } else {
+            grid[row][col].setBackground(Color.RED);
+            //System.out.println('l');
+        }
+    }
+
+    /*
+    Same as method getSolution, except this one is for visual
+    I added a time sleeper and called paintBox for this method so that the
+    user can see the algorithm in action
+     */
+    public boolean solve(Box[][] grid, int row, int col, Timer timer){
+        try {
+            if (col >= 9 && row >= 8) {
+                return true;
+            }
+
+            if (col > 8) {
+                col = 0;
+                row++;
+            }
+
+            if (grid[row][col].getNum() != 0) {
+                return solve(grid, row, col + 1, timer);
+            }
+
+            for (int trialNum = 1; trialNum <= 9; trialNum++) {
+                paintBox(grid, row, col, trialNum);
+//                this.revalidate();
+//                this.repaint();
+                timer.start();
+                Thread.sleep(1);
+                if (valid(grid, row, col, trialNum)) {
+                    grid[row][col].changeNum(trialNum);
+                    //printGrid(grid);
+                    if (solve(grid, row, col + 1, timer)) {
+                        return true;
+                    }
+                }
+            }
+            grid[row][col].changeNum(0); // backtrack
+            paintBox(grid, row, col, 0);
+//            revalidate();
+//            repaint();
+            timer.start();
+            return false;
+        } catch (InterruptedException e) {
+
+        }
+        return false;
+    }
+//    @Override
+//    public void run() {
+//        while (true) {
+//            this.repaint();
+//        }
+//    }
 }
