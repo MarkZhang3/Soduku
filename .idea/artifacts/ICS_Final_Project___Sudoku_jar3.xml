@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ICS Final Project - Sudoku:jar3">
+    <output-path>$PROJECT_DIR$/out/artifacts/ICS_Final_Project___Sudoku_jar3</output-path>
+    <root id="archive" name="ICS Final Project - Sudoku.jar">
+      <element id="module-output" name="ICS Final Project - Sudoku" />
+    </root>
+  </artifact>
+</component>

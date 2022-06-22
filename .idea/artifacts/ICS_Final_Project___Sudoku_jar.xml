@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ICS Final Project - Sudoku:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ICS_Final_Project___Sudoku_jar</output-path>
+    <root id="archive" name="ICS Final Project - Sudoku.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/out/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="ICS Final Project - Sudoku" />
+    </root>
+  </artifact>
+</component>
